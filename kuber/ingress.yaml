@@ -1,0 +1,28 @@
+  apiVersion: networking.k8s.io/v1
+  kind: Ingress
+  metadata:
+    name: diplomingress
+    namespace: monitoring
+  spec:
+    ingressClassName: nginx
+    rules:
+      - host: app.dubininvk.ru
+        http:
+          paths:
+            - pathType: Prefix
+              backend:
+                service:
+                  name: myappsvc
+                  port:
+                    name: http-myapp
+              path: /
+      - host: grafana.dubininvk.ru
+        http:
+          paths:
+            - pathType: Prefix
+              backend:
+                service:
+                  name: prometheus-grafana
+                  port:
+                    name: http-web
+              path: /

@@ -1,0 +1,76 @@
+Для внешнего подключения:
+
+Настраиваем сервисный акк
+
+kubectl apply -f sa.yaml
+
+Вводим ИД кластера
+
+CLUSTER_ID=cat172eckh06olkha9mp
+
+Пишем сертификат
+
+yc managed-kubernetes cluster get --id $CLUSTER_ID --format json | \
+  jq -r .master.master_auth.cluster_ca_certificate | \
+  awk '{gsub(/\\n/,"\n")}1' > ca.pem
+
+Ловим токен сервисного акка
+
+SA_TOKEN=$(kubectl -n kube-system get secret $(kubectl -n kube-system get secret | grep admin-user-token | awk '{print $1}') -o json | jq -r .data.token | base64 -d)
+
+Ловим эндпоинт для подключения
+
+MASTER_ENDPOINT=$(yc managed-kubernetes cluster get --id $CLUSTER_ID \
+  --format json | \
+  jq -r .master.endpoints.external_v4_endpoint)
+
+Дополняем файл конфигурации:
+
+kubectl config set-cluster sa-test2 \
+  --certificate-authority=ca.pem \
+  --embed-certs \
+  --server=$MASTER_ENDPOINT \
+  --kubeconfig=test.kubeconfig
+
+Вносим туда токен:
+
+kubectl config set-credentials admin-user \
+  --token=$SA_TOKEN \
+  --kubeconfig=test.kubeconfig
+
+Добавьте информацию о контексте в файл конфигурации
+
+kubectl config set-context default \
+  --cluster=sa-test2 \
+  --user=admin-user \
+  --kubeconfig=test.kubeconfig
+
+
+Кодируем получившийся конфиг
+
+user@user-VirtualBox:~/devops-diplom-yandexcloud/kuber$ cat test.kubeconfig | base64
+
+
+--------
+
+Деплоим ингресс контроллер
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx && \
+helm repo update && \
+helm install ingress-nginx ingress-nginx/ingress-nginx --namespace=monitoring
+
+---------
+
+Деплоим helm chart с мониторингом
+
+kubectl create namespace monitoring
+
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts && \
+helm repo update && \
+helm install prometheus prometheus-community/kube-prometheus-stack --namespace=monitoring
+
+kubectl get all -n monitoring
+
+---------
+
+
