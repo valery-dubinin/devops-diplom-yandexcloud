@@ -6,7 +6,7 @@ kubectl apply -f sa.yaml
 
 Вводим ИД кластера
 
-CLUSTER_ID=cat172eckh06olkha9mp
+CLUSTER_ID=catk17ml3pued0h6brof
 
 Пишем сертификат
 
@@ -44,6 +44,12 @@ kubectl config set-context default \
   --cluster=sa-test2 \
   --user=admin-user \
   --kubeconfig=test.kubeconfig
+
+Используем конфиг длядальнейшей работы:
+
+kubectl config use-context default \
+  --kubeconfig=test.kubeconfig
+
 
 
 Кодируем получившийся конфиг
