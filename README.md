@@ -203,8 +203,6 @@ shared_credentials_files    = ["./credfile.key"]
 ---
 ### Решение:
 
-Разворачиваем стек мониторинга. Для этого воспользуемся пакетом [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
-
 Создаем пространство имен:
 
 ![img](https://github.com/valery-dubinin/devops-diplom-yandexcloud/blob/main/img/09.png)
@@ -225,7 +223,7 @@ helm install ingress-nginx ingress-nginx/ingress-nginx --namespace=monitoring
 
 ![img](https://github.com/valery-dubinin/devops-diplom-yandexcloud/blob/main/img/10.png)
 
-Затем устанавливаем систему мониторинга:
+Разворачиваем стек мониторинга. Для этого воспользуемся пакетом [kube-prometheus](https://github.com/prometheus-operator/kube-prometheus)
 
 <details>
 <summary>Подключаем в helm репозиторий и деплоим чарт с мониторингом:</summary>
